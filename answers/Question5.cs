@@ -100,10 +100,42 @@ public class Question5 : IAnswer
 
     public string ProcessAnswer2() 
     {
+        var (map, lines, inputStart) = BuildTowerMap();
 
-        // TODO: PART 2
+        string numberRegex = @"move (\d+) from (\d+) to (\d+)";
+        for(int i = inputStart; i < lines.Count; i++)
+        {
+            var found = Regex.Match(lines[i], numberRegex);
+            
+            int howManyToMove = Convert.ToInt32(found.Groups[1].Value);
+            int src = Convert.ToInt32(found.Groups[2].Value);
+            int dest = Convert.ToInt32(found.Groups[3].Value);
 
-        return "";
+            var srcStackRef = map[src];
+            var destStackRef = map[dest];
+
+            List<string> container = new();
+            for(int count = 0; count < howManyToMove; count++) 
+            {
+                var item = srcStackRef.Pop();
+                container.Add(item.ToString());
+            }
+
+            while(container.Count != 0)
+            {
+                destStackRef.Push(container.Last().ToCharArray()[0]);
+                container.RemoveAt(container.Count - 1);
+            }
+        }
+
+        // Select top of all stacks
+        string answer = string.Empty;
+        foreach(var tower in map) 
+        {
+            answer += tower.Value.Pop();
+        }
+
+        return answer;
     }
 
     public void PrintAnswer()
@@ -111,7 +143,7 @@ public class Question5 : IAnswer
         var answer = ProcessAnswer();
         Console.WriteLine($"Quesiton 5: top crates are - {answer}");
 
-        var answer2 = ProcessAnswer();
+        var answer2 = ProcessAnswer2();
         Console.WriteLine($"Question 5 Part 2: {answer2}");
     }
 }
